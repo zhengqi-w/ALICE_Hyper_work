@@ -573,16 +573,19 @@ void ProcessInvmass(std::vector<std::vector<TH1F*>> h_mass_matter, std::vector<s
         double y_max = h_mass_total[i][j]->GetMaximum();
         h_mass_total[i][j]->SetMaximum(y_max*1.2);
         h_mass_total[i][j]->Draw("PE0");
-        leg[i][j] = new TLegend(0.5,0.7,0.9,0.9);
-        leg[i][j]->SetBorderSize(0);
-        leg[i][j]->SetFillColor(0);
-        leg[i][j]->SetTextFont(42);
-        leg[i][j]->SetTextSize(0.05);
-        leg[i][j]->AddEntry((TObject*)0,Form("%s",dataset.Data()),"");
-        leg[i][j]->AddEntry(h_mass_total[i][j],"Matter + Antimatter","lep");
-        leg[i][j]->Draw("SAME");
-        tool::drawMyTextNDC(0.5,0.6,0.05,Form("Cen: %.2f-%.2f",config::Cenbin[i],config::Cenbin[i+1]),kRed);
-        tool::drawMyTextNDC(0.5,0.5,0.05,Form("Pt: %.2f-%.2f",config::Ptbin[j],config::Ptbin[j+1]),kRed);
+        if(PlotOnly)
+        {
+          leg[i][j] = new TLegend(0.5,0.7,0.9,0.9);
+          leg[i][j]->SetBorderSize(0);
+          leg[i][j]->SetFillColor(0);
+          leg[i][j]->SetTextFont(42);
+          leg[i][j]->SetTextSize(0.05);
+          leg[i][j]->AddEntry((TObject*)0,Form("%s",dataset.Data()),"");
+          leg[i][j]->AddEntry(h_mass_total[i][j],"Matter + Antimatter","lep");
+          leg[i][j]->Draw("SAME");
+          tool::drawMyTextNDC(0.5,0.6,0.05,Form("Cen: %.2f-%.2f",config::Cenbin[i],config::Cenbin[i+1]),kRed);
+          tool::drawMyTextNDC(0.5,0.5,0.05,Form("P_{t}: %.2f-%.2f",config::Ptbin[j],config::Ptbin[j+1]),kRed);
+        }
         if(!PlotOnly)
         {
           ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(60000);
@@ -615,6 +618,17 @@ void ProcessInvmass(std::vector<std::vector<TH1F*>> h_mass_matter, std::vector<s
           signal_func[i][j]->Draw("SAME");
           back_func[i][j]->Draw("SAME");
           //Legend
+          leg[i][j] = new TLegend(0.6,0.5,0.9,0.7);
+          leg[i][j]->SetBorderSize(0);
+          leg[i][j]->SetFillColor(0);
+          leg[i][j]->SetTextFont(42);
+          leg[i][j]->SetTextSize(0.05);
+          leg[i][j]->AddEntry(fitfunc_clone[i][j],"signal + bkg","l");
+          leg[i][j]->AddEntry(signal_func[i][j],"signal","l");
+          leg[i][j]->AddEntry(back_func[i][j],"bkg","l");
+          leg[i][j]->Draw("SAME");
+          tool::drawMyTextNDC(0.5,0.8,0.05,Form("PbPb, #sqrt{s_{NN}}=5.36 TeV, %.2f-%.2f%%",config::Cenbin[i],config::Cenbin[i+1]),kBlack);
+          tool::drawMyTextNDC(0.5,0.7,0.05,Form("%.2f (Gev/c)< P_{t} <%.2f (Gev/c)",config::Ptbin[j],config::Ptbin[j+1]),kBlack);
           if(DoProduction)
           {
             double mean = fitfunc[i][j]->GetParameter(1);   
@@ -652,7 +666,7 @@ void ProcessInvmass(std::vector<std::vector<TH1F*>> h_mass_matter, std::vector<s
   {
     //plot fit mean and sigma
     xpos += 50;
-    TCanvas* canvas_meansigma = tool::GetCanvas(Form("canvas_meansigma_%s_%s",dataset.Data(),target.Data()),xpos,ypos,900,400,0,0,0.05,0.08,0.14,0.03);
+    TCanvas* canvas_meansigma = tool::GetCanvas(Form("canvas_meansigma_%s_%s",dataset.Data(),target.Data()),xpos,ypos,900,800,0,0,0.05,0.08,0.14,0.03);
     canvas_meansigma->Divide(isize,2);
     TGraphErrors* E_mean[isize];
     TGraphErrors* E_sigma[isize];
@@ -678,6 +692,8 @@ void ProcessInvmass(std::vector<std::vector<TH1F*>> h_mass_matter, std::vector<s
       tool::SetMarkerTH1(E_mean[i],"",47,1.5,4,4);
       h_mean_empty[i]->Draw();
       E_mean[i]->Draw("SAMEPE0");
+      tool::drawMyTextNDC(0.2,0.8,0.05,Form("PbPb, #sqrt{s_{NN}}=5.36 TeV"),kBlack);
+      tool::drawMyTextNDC(0.2,0.7,0.05,Form("Cen: %.2f-%.2f",config::Cenbin[i],config::Cenbin[i+1]),kBlack);
       canvas_meansigma->cd(isize+i+1);
       for(int j = 0; j < jsize; j++)
       {
@@ -689,6 +705,8 @@ void ProcessInvmass(std::vector<std::vector<TH1F*>> h_mass_matter, std::vector<s
       tool::SetMarkerTH1(E_sigma[i],"",45,1.5,4,4);
       h_sigma_empty[i]->Draw();
       E_sigma[i]->Draw("SAMEPE0");
+      tool::drawMyTextNDC(0.2,0.8,0.05,Form("PbPb, #sqrt{s_{NN}}=5.36 TeV"),kBlack);
+      tool::drawMyTextNDC(0.2,0.7,0.05,Form("Cen: %.2f-%.2f",config::Cenbin[i],config::Cenbin[i+1]),kBlack);
     }
     TString saving_path_meansigma = Form("../output/%s_%s/",dataset.Data(),target.Data());
     saving_path_meansigma = tool::create_folder(saving_path_meansigma);
@@ -723,6 +741,8 @@ void ProcessInvmass(std::vector<std::vector<TH1F*>> h_mass_matter, std::vector<s
       h_yield_empty[i]->Draw();
       E_yield[i]->Draw("SAMEPE0");
       //Legend 
+      tool::drawMyTextNDC(0.2,0.8,0.05,Form("PbPb, #sqrt{s_{NN}}=5.36 TeV"),kBlack);
+      tool::drawMyTextNDC(0.2,0.7,0.05,Form("Cen: %.2f-%.2f",config::Cenbin[i],config::Cenbin[i+1]),kBlack);
     }
     TString saving_path = Form("../output/%s_%s/",dataset.Data(),target.Data());
     saving_path = tool::create_folder(saving_path);

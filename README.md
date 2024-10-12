@@ -25,7 +25,7 @@ git checkout main //main branch
 2. check out the file status
 git status
 3. add file to Standing Area
-git add. //add all files
+git add . //add all files
 git add <file> //add a certain file
 4. commit the file
 git commit -m "second commit" 

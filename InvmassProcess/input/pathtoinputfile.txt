@@ -1,2 +1,1 @@
-/Users/zhengqingwang/alice/data/rootfile/02/AO2D.root
-/Users/zhengqingwang/alice/data/rootfile/01/AO2D.root
+/Users/zhengqingwang/alice/data/derived/Hypertriton_2body/LHC23_PbPb_fullTPC/pass4/AO2D.root

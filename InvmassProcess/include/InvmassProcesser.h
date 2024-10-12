@@ -1,5 +1,6 @@
 // varibles defines here
-const TString TreeName_1 = "O2hypcands";//O2hypcandsflow
+//const TString TreeName_1 = "O2hypcands";
+const TString TreeName_1 = "O2hypcandsflow";
 TTree* fTreeChain;
 const Double_t PionMass = 0.1395704;
 const Double_t KaonMass = 0.493677;
@@ -16,12 +17,12 @@ Int_t cansizeX=580, cansizeY=500;
 Float_t  fCentralityFT0A; 
 Float_t  fCentralityFT0C; 
 Float_t  fCentralityFT0M; 
-// Float_t  fPsiFT0A; 
-// Float_t  fMultFT0A; 
-// Float_t  fPsiFT0C; 
-// Float_t  fMultFT0C; 
-// Float_t  fPsiTPC; 
-// Float_t  fMultTPC; 
+Float_t  fPsiFT0A; 
+Float_t  fMultFT0A; 
+Float_t  fPsiFT0C; 
+Float_t  fMultFT0C; 
+Float_t  fPsiTPC; 
+Float_t  fMultTPC; 
 Float_t  fXPrimVtx; 
 Float_t  fYPrimVtx; 
 Float_t  fZPrimVtx; 
@@ -44,21 +45,23 @@ UChar_t  fNTPCclusPi;
 Float_t  fTPCmomHe; 
 Float_t  fTPCmomPi; 
 UShort_t fTPCsignalHe; 
-UShort_t fTPCsignalPi; 
+UShort_t fTPCsignalPi;
+Float_t  fTPCChi2He;//added
 UInt_t   fITSclusterSizesHe; 
 UInt_t   fITSclusterSizesPi; 
 UChar_t  fFlags; 
-Bool_t   fTracked; 
+//Bool_t   fTracked; 
+Int_t fTrackedClSize;//added
 //Branches
 TBranch* b_CentralityFT0A; 
 TBranch* b_CentralityFT0C; 
 TBranch* b_CentralityFT0M; 
-// TBranch* b_PsiFT0A; 
-// TBranch* b_MultFT0A; 
-// TBranch* b_PsiFT0C; 
-// TBranch* b_MultFT0C; 
-// TBranch* b_PsiTPC; 
-// TBranch* b_MultTPC; 
+TBranch* b_PsiFT0A; 
+TBranch* b_MultFT0A; 
+TBranch* b_PsiFT0C; 
+TBranch* b_MultFT0C; 
+TBranch* b_PsiTPC; 
+TBranch* b_MultTPC; 
 TBranch* b_XPrimVtx; 
 TBranch* b_YPrimVtx; 
 TBranch* b_ZPrimVtx; 
@@ -82,14 +85,16 @@ TBranch* b_TPCmomHe;
 TBranch* b_TPCmomPi; 
 TBranch* b_TPCsignalHe; 
 TBranch* b_TPCsignalPi; 
+TBranch* b_TPCChi2He;//added
 TBranch* b_ITSclusterSizesHe; 
 TBranch* b_ITSclusterSizesPi; 
 TBranch* b_Flags; 
-TBranch* b_Tracked; 
+//TBranch* b_Tracked; 
+TBranch* b_TrackedClSize;//added
 //vectors for branchaddress
 std::vector<Int_t*> Hypertriton_BranchAddress_int = 
 {
-  
+  &fTrackedClSize
 };
 
 std::vector<Float_t*> Hypertriton_BranchAddress_float = 
@@ -97,12 +102,12 @@ std::vector<Float_t*> Hypertriton_BranchAddress_float =
   &fCentralityFT0A,
   &fCentralityFT0C,
   &fCentralityFT0M,
-  // &fPsiFT0A,
-  // &fMultFT0A,
-  // &fPsiFT0C,
-  // &fMultFT0C,
-  // &fPsiTPC,
-  // &fMultTPC,
+  &fPsiFT0A,
+  &fMultFT0A,
+  &fPsiFT0C,
+  &fMultFT0C,
+  &fPsiTPC,
+  &fMultTPC,
   &fXPrimVtx, 
   &fYPrimVtx, 
   &fZPrimVtx,
@@ -120,7 +125,8 @@ std::vector<Float_t*> Hypertriton_BranchAddress_float =
   &fDcaPi, 
   &fNSigmaHe,
   &fTPCmomHe, 
-  &fTPCmomPi  
+  &fTPCmomPi,
+  &fTPCChi2He  
 
 };
 
@@ -151,7 +157,7 @@ std::vector<UInt_t*> Hypertriton_BranchAddress_uint =
 std::vector<Bool_t*> Hypertriton_BranchAddress_bool =
 {
   &fIsMatter,
-  &fTracked
+  //&fTracked
 };
 //vector for branches
 std::vector<TBranch*> Hypertriton_Branches = 
@@ -159,12 +165,12 @@ std::vector<TBranch*> Hypertriton_Branches =
   b_CentralityFT0A, 
   b_CentralityFT0C, 
   b_CentralityFT0M,
-  // b_PsiFT0A, 
-  // b_MultFT0A, 
-  // b_PsiFT0C, 
-  // b_MultFT0C, 
-  // b_PsiTPC, 
-  // b_MultTPC, 
+  b_PsiFT0A, 
+  b_MultFT0A, 
+  b_PsiFT0C, 
+  b_MultFT0C, 
+  b_PsiTPC, 
+  b_MultTPC, 
   b_XPrimVtx, 
   b_YPrimVtx, 
   b_ZPrimVtx, 
@@ -187,11 +193,13 @@ std::vector<TBranch*> Hypertriton_Branches =
   b_TPCmomHe, 
   b_TPCmomPi, 
   b_TPCsignalHe, 
-  b_TPCsignalPi, 
+  b_TPCsignalPi,
+  b_TPCChi2He,//added 
   b_ITSclusterSizesHe, 
   b_ITSclusterSizesPi, 
   b_Flags, 
-  b_Tracked 
+  //b_Tracked
+  b_TrackedClSize//added 
 };
 //functions
 void DrawSignalvsBKG(TH1* h_signal,TH1* h_signal_anti,TH1* h_bkg,TH1* h_bkg_anti,TString dataset,TString target);
